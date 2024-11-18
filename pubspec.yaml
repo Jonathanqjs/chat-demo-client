@@ -1,0 +1,39 @@
+name: mychat
+description: "A new Flutter project."
+
+# Prevent accidental publishing to pub.dev.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  dio: ^5.7.0 
+  dio_cookie_manager: ^3.1.1
+  cookie_jar: ^4.0.8
+  provider: ^6.1.2
+  web_socket_channel: ^3.0.1 
+  socket_io_client: ^3.0.2
+  path_provider: ^2.1.5
+  image_picker: ^1.1.2
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Enable generation of localized Strings from arb files.
+  generate: true
+
+  assets:
+    # Add assets from the images directory to the application.
+    - assets/images/

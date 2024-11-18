@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Client</title>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+  <script>
+    // 连接到 WebSocket 服务器
+    const socket = io('ws://localhost:3000/chat', {
+      query: {
+        userId: 'yourUserId' // 传递用户ID作为查询参数
+      }
+    });
+
+    // 监听连接事件
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    // 监听断开连接事件
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket server');
+    });
+
+    // 监听接收消息事件
+    socket.on('receiveMessage', (data) => {
+      console.log('Received message:', data);
+    });
+
+    // 发送消息
+    function sendMessage(receiverId, message) {
+      socket.emit('sendMessage', { receiverId, message });
+    }
+
+    // 示例：发送消息给接收者
+    sendMessage('receiverUserId', 'Hello, this is a test message');
+  </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Request {
@@ -19,8 +20,8 @@ class Request {
     final cookiePath = '${appDocDir.path}/.cookies/';
     dio = Dio(BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 1),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
       headers: {
         'api': '1.0.0',
       },
@@ -69,6 +70,24 @@ class Request {
 
   addFriend({friendName}) async {
     var res = await dio.post('/friends/add', data: {friendName});
+    return res;
+  }
+
+  sendImage({required int receiverId, required XFile image}) async {
+    String fileName = image.path.split('/').last;
+    FormData formData = FormData.fromMap({
+      'receiverId': receiverId,
+      'file': await MultipartFile.fromFile(image.path, filename: fileName),
+    });
+    var res = await dio.post('/message/sendImage', data: formData);
+    return res;
+  }
+
+  Future<Response<List<int>>> getImage({required String fileName}) async {
+    var res = await dio.get<List<int>>('/message/getImage/$fileName',
+        options: Options(
+          responseType: ResponseType.bytes,
+        ));
     return res;
   }
 }

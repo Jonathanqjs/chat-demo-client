@@ -18,8 +18,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _usernameController = TextEditingController(text: 'qjs');
-  final TextEditingController _passwordController = TextEditingController(text: '123456');
+  final TextEditingController _usernameController = TextEditingController(text: '');
+  final TextEditingController _passwordController = TextEditingController(text: '');
 
   Future<void> _login() async {
     final String username = _usernameController.text;

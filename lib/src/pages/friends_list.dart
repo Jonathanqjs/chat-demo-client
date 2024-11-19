@@ -36,8 +36,8 @@ class _FriendsListViewState extends State<FriendsListView> {
 
   @override
   void dispose() {
-    SocketService().close();
     super.dispose();
+    SocketService().close();
   }
 
   void _connectSocketService() async {

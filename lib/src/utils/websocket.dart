@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
@@ -7,6 +9,7 @@ class SocketService {
   factory SocketService() => _instance;
 
   late IO.Socket socket;
+  Timer? _reconnectTimer;
 
   SocketService._internal();
 
@@ -24,14 +27,29 @@ class SocketService {
 
     socket.onConnect((_) {
       print('Connected from Socket.IO server');
+      _reconnectTimer?.cancel(); 
     });
 
     socket.onDisconnect((_) {
       print('Disconnected from Socket.IO server');
+      _startReconnect();
     });
 
     socket.onError((error) {
       print('Socket.IO error: $error');
+    });
+  }
+
+
+  void _startReconnect() {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (socket.disconnected) {
+        print('Attempting to reconnect...');
+        socket.connect();
+      } else {
+        timer.cancel();
+      }
     });
   }
 
@@ -44,6 +62,7 @@ class SocketService {
   }
 
   void close() {
+    _reconnectTimer?.cancel();
     socket.disconnect();
   }
 }

@@ -128,16 +128,16 @@ class _FriendsListViewState extends State<FriendsListView> {
               child: Text('确认'),
               onPressed: () async {
                 // Handle the add contacts action
-                Navigator.of(context).pop();
                 final result =
                     await Request().addFriend(friendName: _friendName.text);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(result['message'])),
+                  SnackBar(content: Text(result.data['message'])),
                 );
-                if (result['code'] == 200) {
+                if (result.data['code'] == 200) {
+                  Navigator.of(context).pop();
                   setState(() {
                     friendsList
-                        .add(UserEntity.fromJson(result['data']['receiver']));
+                        .add(UserEntity.fromJson(result.data['data']['receiver']));
                   });
                 }
               },
@@ -152,7 +152,8 @@ class _FriendsListViewState extends State<FriendsListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('好友'),
+        title: const  Text('好友'),
+        centerTitle: true,
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.more_horiz),
@@ -162,6 +163,7 @@ class _FriendsListViewState extends State<FriendsListView> {
               } else if (value == 'logout') {
                 final response = await Request().logout();
                 if(response.data['code'] == 200 && mounted) {
+                  SocketService().close();
                   Provider.of<GlobalState>(context, listen: false).updateUser(null);
                   Navigator.pushReplacementNamed(context, LoginPage.routeName);
                 }
@@ -225,11 +227,11 @@ class _FriendsListViewState extends State<FriendsListView> {
                       ? messages.last.content
                       : 'No messages'),
                   trailing: const Icon(Icons.chevron_right),
-                  leading: const CircleAvatar(
-                    // Display the Flutter Logo image asset.
-                    foregroundImage:
-                        AssetImage('assets/images/flutter_logo.png'),
-                  ),
+                  leading: const Icon(Icons.person,size: 35,),
+                  // leading: const CircleAvatar(
+                  //   foregroundImage:
+                  //       AssetImage('assets/images/flutter_logo.png'),
+                  // ),
                   onTap: () {
                     Navigator.restorablePushNamed(
                       context,

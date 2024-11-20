@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mychat/src/utils/setting.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Request {
@@ -11,7 +12,6 @@ class Request {
   factory Request() {
     return _instance;
   }
-  final String baseUrl = 'http://localhost:3000';
 
   Request._internal();
 
@@ -53,6 +53,12 @@ class Request {
     return res;
   }
 
+  register({username, password}) async {
+    var res = await dio.post('/user/register',
+        data: {'userName': username, 'password': password});
+    return res;
+  }
+
   isLogin() async {
     var res = await dio.post('/user/isLogin');
     return res;
@@ -69,7 +75,7 @@ class Request {
   }
 
   addFriend({friendName}) async {
-    var res = await dio.post('/friends/add', data: {friendName});
+    var res = await dio.post('/friends/add', data: {'friendName':friendName});
     return res;
   }
 

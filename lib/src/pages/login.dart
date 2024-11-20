@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mychat/src/entities/index.dart';
 import 'package:mychat/src/pages/friends_list.dart';
+import 'package:mychat/src/pages/register.dart';
 
 import 'package:mychat/src/utils/request.dart';
 import 'package:mychat/src/utils/state.dart';
@@ -81,6 +82,15 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: _login,
                 child: const Text('登录'),
+              ),
+            ),
+            SizedBox(
+              width: 200.0,
+              child: ElevatedButton(
+                onPressed: (){
+                  Navigator.restorablePushNamed(context, RegisterPage.routeName);
+                },
+                child: const Text('注册'),
               ),
             ),
           ],

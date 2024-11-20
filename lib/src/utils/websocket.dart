@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:mychat/src/utils/setting.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
-  final String baseUrl = 'http://localhost:3000/socket';
   static final SocketService _instance = SocketService._internal();
 
   factory SocketService() => _instance;
@@ -16,7 +16,7 @@ class SocketService {
 // 连接到 Socket.IO 服务器
   void connect(
       {required Map<String, String> params}) {
-    final uri = Uri.parse(baseUrl).replace(queryParameters: params).toString();
+    final uri = Uri.parse('${baseUrl}socket').replace(queryParameters: params).toString();
     socket = IO.io(uri, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,

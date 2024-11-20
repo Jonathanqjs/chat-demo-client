@@ -23,6 +23,7 @@ class ChatListView extends StatefulWidget {
 
 class _ChatListViewState extends State<ChatListView> {
   late UserEntity _friend = UserEntity();
+  late Directory _temporaryDirectory;
   final List<MessageEntity> _messages = [];
   final TextEditingController _controller = TextEditingController();
   final ImagePicker _picker = ImagePicker();
@@ -57,11 +58,13 @@ class _ChatListViewState extends State<ChatListView> {
           _messages.add(message);
         }
       });
-      _scrollToBottom();
+      _scrollToBottom()
+      ;
     }
   }
 
-  void _init(_) {
+  void _init(_) async {
+    _temporaryDirectory = await getTemporaryDirectory();
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     setState(() {
@@ -70,15 +73,16 @@ class _ChatListViewState extends State<ChatListView> {
       }));
       _friend = UserEntity.fromJson(args['friend']);
     });
+    
   }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          0.0,
           duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          curve: Curves.easeInOut,
         );
       }
     });
@@ -96,13 +100,13 @@ class _ChatListViewState extends State<ChatListView> {
 
   Future<void> _selectImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    await Request()
-        .sendImage(receiverId: _friend.userId, image: pickedFile!);
+    if (pickedFile != null) {
+      await Request().sendImage(receiverId: _friend.userId, image: pickedFile);
+    }
   }
 
   Future<File?> getImageToFile(String fileName) async {
-    final directory = await getTemporaryDirectory();
-    final path = '${directory.path}/$fileName';
+    final path = '${_temporaryDirectory.path}/$fileName';
     final file = File(path);
     if (!file.existsSync()) {
       final res = await Request().getImage(fileName: fileName);
@@ -133,18 +137,29 @@ class _ChatListViewState extends State<ChatListView> {
               ? FutureBuilder<File?>(
                   future: getImageToFile(message.mediaUrl),
                   builder: (context, snapshot) {
+                    double width = 200;
+                    double height = 200;
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
                         return Image.file(
                           snapshot.data!,
-                          width: 200,
-                          height: 200,
+                          width: width,
+                          height: height,
                         );
                       } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
+                        return Image.network(
+                          'https://q4.itc.cn/images01/20240705/e1b935ff26614781bb135e467f266f42.jpeg',
+                          width: width,
+                          height: height,
+                        );
                       }
                     }
-                    return CircularProgressIndicator();
+                    return Container(
+                      width: width,
+                      height: height,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(),
+                    );
                   },
                 )
               : Text(
@@ -160,16 +175,18 @@ class _ChatListViewState extends State<ChatListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: Text(_friend.userName),
+        centerTitle: true
       ),
       body: Column(
         children: <Widget>[
           Expanded(
             child: ListView.builder(
+              reverse:true,
               controller: _scrollController,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                return renderMessage(_messages[index], index);
+                return renderMessage(_messages[_messages.length - 1 - index], index);
               },
             ),
           ),
@@ -180,7 +197,7 @@ class _ChatListViewState extends State<ChatListView> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    focusNode: FocusNode(),
+                    focusNode: _focusNode,
                     decoration: const InputDecoration(
                         // hintText: 'Enter message',
                         border: OutlineInputBorder()),
